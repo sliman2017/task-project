@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaskList extends Model
 {
+    protected $table = 'lists';
     protected $fillable = [
         'title',
         'description',

@@ -67,16 +67,23 @@ class ListController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, TaskList $list)
     {
-        //
+            $validated = $request->validate([
+            'title'=>'required|string|max:255',
+            'description'=>'nullable|string',
+        ]);
+
+        $list->update($validated);
+        return redirect()->route('lists.index')->with('success','List updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(TaskList $list)
     {
-        //
+        $list->delete();
+        return redirect()->route('lists.index')->with('success','List deleted successfully');
     }
 }

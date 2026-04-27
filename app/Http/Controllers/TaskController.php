@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Task;
 use App\Models\TaskList;
 
 class TaskController extends Controller
@@ -13,7 +14,39 @@ class TaskController extends Controller
      */
     public function index()
     {
-    
+        $query = Task::with('lists')
+            ->whereHas('lists', function($query){
+                $query->where('user_id', auth()->id());
+            })->orderBy('created_at', 'desc');
+
+            //this statement for search option.
+        if(request()->has('search')){
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+            // this statement for filter option.
+        if(request()->has('filter') && request('filter') !== 'all'){
+            $query->where('is_completed', request('filter') === 'completed');
+        }
+        $tasks = $query->paginate(10);
+        $lists = TaskList::where('user_id', auth()->id())->get();
+        return Inertia::render('Tasks/Index', [
+                'tasks' => $tasks,
+                'lists' => $lists,
+                'filters' => [
+                    'search' => request('search', ''),
+                    'filter' => request('filter', 'all'),
+                ],
+                'flash' => [
+                    'success' => session('success'),
+                    'error' => session('error'),
+                ],
+        ]);
+
     }
 
     /**
@@ -29,7 +62,19 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title'=>'required|string|max:255',
+            'description'=>'nullable|string',
+            'due_date'=>'nullable|date',
+            'list_id'=>'required|exists:task_lists,id',
+            'is_completed'=>'boolean',
+        ]);
+
+        TaskList::create([
+            ...$validated,
+            'user_id'=>auth()->id(),
+        ]);
+        return redirect()->route('lists.index')->with('success','List created successfully');
     }
 
     /**

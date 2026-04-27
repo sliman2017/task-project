@@ -70,6 +70,13 @@ export default function ListsIndex({ lists, flash }: Props) {
         }
     }, [showToast]);
 
+    useEffect(() => {
+        if (!isOpen) {
+            setEditingList(null);
+            reset();
+        }
+    }, [isOpen]);
+
     const { data, setData, post, put, processing, reset, delete: destroy } = useForm({
         title: '',
         description: '',

@@ -11,7 +11,7 @@ Route::inertia('/', 'welcome', [
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('lists', ListController::class);
-    Route::inertia('tasks', 'Tasks/Index')->name('tasks');
+    Route::resource('tasks', TaskController::class);
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
 

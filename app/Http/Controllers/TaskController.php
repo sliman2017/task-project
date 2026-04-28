@@ -70,11 +70,8 @@ class TaskController extends Controller
             'is_completed'=>'boolean',
         ]);
 
-        TaskList::create([
-            ...$validated,
-            'user_id'=>auth()->id(),
-        ]);
-        return redirect()->route('lists.index')->with('success','List created successfully');
+        Task::create($validated);
+        return redirect()->route('tasks.index')->with('success','Task created successfully');
     }
 
     /**
@@ -96,16 +93,26 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Task $task)
     {
-        //
+        $validated = $request->validate([
+            'title'=>'required|string|max:255',
+            'description'=>'nullable|string',
+            'due_date'=>'nullable|date',
+            'list_id'=>'required|exists:task_lists,id',
+            'is_completed'=>'boolean',
+        ]);
+
+        $task->update($validated);
+        return redirect()->route('tasks.index')->with('success','Task updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Task $task)
     {
-        //
+        $task->delete();
+        return redirect()->route('tasks.index')->with('success','Task deleted successfully'); 
     }
 }

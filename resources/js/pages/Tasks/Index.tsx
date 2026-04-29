@@ -3,31 +3,61 @@ import { Link } from '@inertiajs/react';
 import { Head, router, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Pencil, Trash2, Edit, CheckCircle2, XCircle, Calendar, List, CheckCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
+import {
+    Plus,
+    Pencil,
+    Trash2,
+    Edit,
+    CheckCircle2,
+    XCircle,
+    Calendar,
+    List,
+    CheckCircle,
+    Search,
+    ChevronLeft,
+    ChevronRight,
+} from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogTrigger,
+    DialogTitle,
+    DialogHeader,
+    DialogDescription,
+    DialogFooter,
+    DialogClose,
+} from '@/components/ui/dialog';
+import { Field, FieldGroup } from '@/components/ui/field';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { BreadcrumbItem } from '@/types';
 import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
 
 interface Task {
-  id: number;
-  title: string;
-  description: string|null;
-  due_date: string|null;
-  is_completed: boolean;
-  list_id: number;
-  list: {
     id: number;
     title: string;
-  }
+    description: string | null;
+    due_date: string | null;
+    is_completed: boolean;
+    list_id: number;
+    list: {
+        id: number;
+        title: string;
+    };
 }
 
-interface List { 
+interface List {
     id: number;
     title: string;
 }
@@ -53,21 +83,29 @@ interface Props {
     };
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {   title: 'Tasks',
-        href: '/tasks', 
-    },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Tasks', href: '/tasks' }];
 
 export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
     const [open, setIsOpen] = useState(false);
-    const [editingTask, setEditingTask] = useState<Task|null>(null);
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [search, setSearch] = useState(filters.search || '');
-    const [showToast, setShowToast] = useState(!!flash.success || !!flash.error);
+    const [showToast, setShowToast] = useState(
+        !!flash.success || !!flash.error,
+    );
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error'>('success');
-    const [completedFilter, setCompletedFilter] = useState<'completed' | 'pending' | 'all'>(filters.filter as 'all' | 'pending' | 'completed');
-    const { data, setData, post, put, processing, reset, delete: destroy } = useForm({
+    const [completedFilter, setCompletedFilter] = useState<
+        'completed' | 'pending' | 'all'
+    >(filters.filter as 'all' | 'pending' | 'completed');
+    const {
+        data,
+        setData,
+        post,
+        put,
+        processing,
+        reset,
+        delete: destroy,
+    } = useForm({
         title: '',
         description: '',
         due_date: '',
@@ -80,8 +118,7 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
             setToastMessage(flash.success);
             setShowToast(true);
             setToastType('success');
-        }
-        else if (flash?.error) {
+        } else if (flash?.error) {
             setToastMessage(flash.error);
             setShowToast(true);
             setToastType('error');
@@ -135,41 +172,95 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        router.get(route('tasks.index'), {
-             search: search, 
-             filter: completedFilter 
-            }, { 
+        router.get(
+            route('tasks.index'),
+            {
+                search: search,
+                filter: completedFilter,
+            },
+            {
                 preserveState: true,
-                preserveScroll: true
-            });
+                preserveScroll: true,
+            },
+        );
     };
 
     const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setCompletedFilter(e.target.value as 'all' | 'pending' | 'completed');
-        router.get(route('tasks.index'), {
-             search: search, 
-             filter: e.target.value 
-            }, { 
+        router.get(
+            route('tasks.index'),
+            {
+                search: search,
+                filter: e.target.value,
+            },
+            {
                 preserveState: true,
-                preserveScroll: true
-            });
+                preserveScroll: true,
+            },
+        );
     };
 
     const handlePageChange = (page: number) => {
-        router.get(route('tasks.index'), {
-             search: search, 
-             filter: completedFilter,
-             page: page,
-            }, { 
+        router.get(
+            route('tasks.index'),
+            {
+                search: search,
+                filter: completedFilter,
+                page: page,
+            },
+            {
                 preserveState: true,
-                preserveScroll: true
-            });
+                preserveScroll: true,
+            },
+        );
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tasks" />
-            {/* Rest of the component */}
+            <div className="flex justify-between m-4">
+                <h1 className="text-2xl font-bold">Tasks</h1>
+                <Dialog>
+                    <form>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">Open Dialog</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-sm">
+                            <DialogHeader>
+                                <DialogTitle>Edit profile</DialogTitle>
+                                <DialogDescription>
+                                    Make changes to your profile here. Click
+                                    save when you&apos;re done.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <FieldGroup>
+                                <Field>
+                                    <Label htmlFor="name-1">Name</Label>
+                                    <Input
+                                        id="name-1"
+                                        name="name"
+                                        defaultValue="Pedro Duarte"
+                                    />
+                                </Field>
+                                <Field>
+                                    <Label htmlFor="username-1">Username</Label>
+                                    <Input
+                                        id="username-1"
+                                        name="username"
+                                        defaultValue="@peduarte"
+                                    />
+                                </Field>
+                            </FieldGroup>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button type="submit">Save changes</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </form>
+                </Dialog>
+            </div>
         </AppLayout>
     );
 }

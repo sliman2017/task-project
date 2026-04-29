@@ -13,7 +13,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, tasks } from '@/routes';
+import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -29,7 +29,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Tasks',
-        href: tasks(),
+        href: '/tasks',
         icon: ListTodo,
     },
 ];

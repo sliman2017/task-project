@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TaskList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ListController extends Controller
@@ -13,7 +14,10 @@ class ListController extends Controller
      */
     public function index()
     {
-        $lists = TaskList::where('user_id',auth()->id())->with('tasks')->get();
+        $lists = TaskList::query()
+            ->where('user_id', '=', Auth::id())
+            ->with('tasks')
+            ->get();
         return Inertia::render('Lists/Index',[
             'lists' => $lists,
             'flash'=> [
@@ -43,7 +47,7 @@ class ListController extends Controller
 
         TaskList::create([
             ...$validated,
-            'user_id'=>auth()->id(),
+            'user_id'=>Auth::id(),
         ]);
         return redirect()->route('lists.index')->with('success','List created successfully');
     }

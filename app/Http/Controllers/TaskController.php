@@ -14,8 +14,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $query = Task::with('lists')
-            ->whereHas('lists', function($query){
+        $query = Task::with('list')
+            ->whereHas('list', function($query){
                 $query->where('user_id', auth()->id());
             })->orderBy('created_at', 'desc');
 

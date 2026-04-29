@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Pencil, Trash2, Edit, CheckCircle2, XCircle, Calendar, List, CheckCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useForm } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BreadcrumbItem } from '@/types';
+import { route } from 'ziggy-js';
 
 interface Task {
   id: number;
@@ -98,4 +97,79 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (editingTask) {
+            put(route('tasks.update', editingTask.id), {
+                onSuccess: () => {
+                    setIsOpen(false);
+                    reset();
+                    setEditingTask(null);
+                },
+            });
+        } else {
+            post(route('tasks.store'), {
+                onSuccess: () => {
+                    setIsOpen(false);
+                    reset();
+                },
+            });
+        }
+    };
+
+    const handleEdit = (task: Task) => {
+        setEditingTask(task);
+        setData({
+            title: task.title,
+            description: task.description || '',
+            due_date: task.due_date ? task.due_date.split('T')[0] : '',
+            list_id: task.list_id.toString(),
+            is_completed: task.is_completed,
+        });
+        setIsOpen(true);
+    };
+
+    const handleDelete = (taskId: number) => {
+        if (confirm('Are you sure you want to delete this task?')) {
+            destroy(route('tasks.destroy', taskId));
+        }
+    };
+
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        router.get(route('tasks.index'), {
+             search: search, 
+             filter: completedFilter 
+            }, { 
+                preserveState: true,
+                preserveScroll: true
+            });
+    };
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setCompletedFilter(e.target.value as 'all' | 'pending' | 'completed');
+        router.get(route('tasks.index'), {
+             search: search, 
+             filter: e.target.value 
+            }, { 
+                preserveState: true,
+                preserveScroll: true
+            });
+    };
+
+    const handlePageChange = (page: number) => {
+        router.get(route('tasks.index'), {
+             search: search, 
+             filter: completedFilter,
+             page: page,
+            }, { 
+                preserveState: true,
+                preserveScroll: true
+            });
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Tasks" />
+            {/* Rest of the component */}
+        </AppLayout>
+    );
 }

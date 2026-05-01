@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Check } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ import {
     DialogFooter,
     DialogClose,
 } from '@/components/ui/dialog';
-import { Field, FieldGroup } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -333,6 +333,25 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                             }
                                             className="focus:ring-2 focus:ring-primary"
                                         />
+                                    </Field>
+                                    <Field orientation="horizontal" className="mb-4 w-56">
+                                        <Checkbox
+                                            id="is_completed"
+                                            checked={data.is_completed}
+                                            onCheckedChange={(checked:boolean) =>
+                                                setData(
+                                                    'is_completed',
+                                                    checked
+                                                )
+                                            }
+                                            className="mt-2"
+                                        />
+                                        <FieldLabel
+                                            htmlFor="is_completed"
+                                            className="ml-2"
+                                        >
+                                            Completed
+                                        </FieldLabel>
                                     </Field>
                                 </FieldGroup>
                                 <DialogFooter>

@@ -115,7 +115,7 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Tasks', href: '/tasks' }];
 
 export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
-    const [open, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [search, setSearch] = useState(filters.search || '');
     const [showToast, setShowToast] = useState(
@@ -154,6 +154,13 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
             setToastType('error');
         }
     }, [flash]);
+
+        useEffect(() => {
+        if (!isOpen) {
+            setEditingTask(null);
+            reset();
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -251,7 +258,7 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                 <Head title="Tasks" />
                 <div className="m-4 flex justify-between">
                     <h1 className="text-2xl font-bold">Tasks</h1>
-                    <Dialog>
+                    <Dialog open={isOpen} onOpenChange={setIsOpen}>
                         <DialogTrigger asChild>
                             <Button variant="default">
                                 <Plus className="h-5 w-5" />
@@ -360,7 +367,7 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                             Cancel
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit">Save changes</Button>
+                                    <Button type="submit">{editingTask ? 'Update Task' : 'Create Task'}</Button>
                                 </DialogFooter>
                             </form>
                         </DialogContent>

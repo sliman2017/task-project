@@ -252,15 +252,15 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                 <div className="m-4 flex justify-between">
                     <h1 className="text-2xl font-bold">Tasks</h1>
                     <Dialog>
-                        <form onSubmit={handleSubmit}>
-                            <DialogTrigger asChild>
-                                <Button variant="default">
-                                    <Plus className="h-5 w-5" />
-                                    New Task
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-sm">
-                                <DialogHeader>
+                        <DialogTrigger asChild>
+                            <Button variant="default">
+                                <Plus className="h-5 w-5" />
+                                New Task
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-sm" aria-describedby={undefined}>
+                            <form onSubmit={handleSubmit}>
+                                <DialogHeader className="mb-4">
                                     <DialogTitle>
                                         {editingTask ? 'Edit Task' : 'New Task'}
                                     </DialogTitle>
@@ -270,6 +270,10 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                         <Label htmlFor="title-1">Title</Label>
                                         <Input
                                             id="title"
+                                            value={data.title}
+                                            onChange={(e) =>
+                                                setData('title', e.target.value)
+                                            }
                                             name="title"
                                             placeholder="Task title"
                                         />
@@ -280,6 +284,13 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                         </Label>
                                         <Input
                                             id="description-1"
+                                            value={data.description}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'description',
+                                                    e.target.value,
+                                                )
+                                            }
                                             name="description"
                                             placeholder="Task description"
                                         />
@@ -311,42 +322,29 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                         <Label htmlFor="due-date-1">
                                             Due Date
                                         </Label>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    data-empty={!date}
-                                                    className="w-[280px] justify-start text-left font-normal data-[empty=true]:text-muted-foreground"
-                                                >
-                                                    <CalendarIcon />
-                                                    {date ? (
-                                                        format(date, 'PPP')
-                                                    ) : (
-                                                        <span>Pick a date</span>
-                                                    )}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={date}
-                                                    onSelect={setDate}
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
+                                        <Input
+                                            type="date"
+                                            value={data.due_date}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'due_date',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className="focus:ring-2 focus:ring-primary"
+                                        />
                                     </Field>
                                 </FieldGroup>
                                 <DialogFooter>
                                     <DialogClose asChild>
-                                        <Button variant="outline">
+                                        <Button type="button" variant="outline">
                                             Cancel
                                         </Button>
                                     </DialogClose>
                                     <Button type="submit">Save changes</Button>
                                 </DialogFooter>
-                            </DialogContent>
-                        </form>
+                            </form>
+                        </DialogContent>
                     </Dialog>
                 </div>
                 <Field className="mr-0 mb-4 flex flex-row items-center">
@@ -360,8 +358,10 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                 className="mr-4 flex-1 justify-between text-muted-foreground"
                                 variant="outline"
                             >
-                                {completedFilter === 'all' || !completedFilter ? 'Filter by status' : completedFilter.charAt(0).toUpperCase() +
-                                    completedFilter.slice(1)}
+                                {completedFilter === 'all' || !completedFilter
+                                    ? 'Filter by status'
+                                    : completedFilter.charAt(0).toUpperCase() +
+                                      completedFilter.slice(1)}
                                 <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>

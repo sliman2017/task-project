@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar } from '@/components/ui/calendar';
 
 import { cn } from '@/lib/utils';
 import {
@@ -56,6 +56,10 @@ import { dashboard } from '@/routes';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -122,7 +126,7 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [completedFilter, setCompletedFilter] = useState<
         'completed' | 'pending' | 'all'
-    >(filters.filter as 'all' | 'pending' | 'completed');
+    >((filters.filter as 'all' | 'pending' | 'completed') || '');
     const {
         data,
         setData,
@@ -304,7 +308,9 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                                         </Select>
                                     </Field>
                                     <Field>
-                                        <Label htmlFor="due-date-1">Due Date</Label>
+                                        <Label htmlFor="due-date-1">
+                                            Due Date
+                                        </Label>
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Button
@@ -343,6 +349,53 @@ export default function TasksIndex({ tasks, lists, filters, flash }: Props) {
                         </form>
                     </Dialog>
                 </div>
+                <Field className="mr-0 mb-4 flex flex-row items-center">
+                    <div className="relative">
+                        <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="Search..." className="pl-8" />
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                className="mr-4 flex-1 justify-between text-muted-foreground"
+                                variant="outline"
+                            >
+                                {completedFilter === 'all' || !completedFilter ? 'Filter by status' : completedFilter.charAt(0).toUpperCase() +
+                                    completedFilter.slice(1)}
+                                <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-32">
+                            <DropdownMenuGroup>
+                                <DropdownMenuLabel className="text-sm font-semibold">
+                                    Filter by status
+                                </DropdownMenuLabel>
+
+                                <DropdownMenuRadioGroup
+                                    value={completedFilter}
+                                    onValueChange={(value) =>
+                                        setCompletedFilter(
+                                            value as
+                                                | 'all'
+                                                | 'pending'
+                                                | 'completed',
+                                        )
+                                    }
+                                >
+                                    <DropdownMenuRadioItem value="all">
+                                        All
+                                    </DropdownMenuRadioItem>
+                                    <DropdownMenuRadioItem value="pending">
+                                        Pending
+                                    </DropdownMenuRadioItem>
+                                    <DropdownMenuRadioItem value="completed">
+                                        Completed
+                                    </DropdownMenuRadioItem>
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </Field>
                 <Table className="w-max min-w-full table-auto border">
                     <TableHeader className="bg-muted">
                         <TableRow>
